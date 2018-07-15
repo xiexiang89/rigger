@@ -19,6 +19,7 @@ Rigger.on(this@MainActivity)
 ```
 
 ## startActivityForResult
+```
    Rigger.on(this@MainActivity)
           .requestCode(REQUEST_CODE)
           .targetActivity(TestActivity::class.java)
@@ -30,3 +31,4 @@ Rigger.on(this@MainActivity)
                                     Toast.LENGTH_LONG).show()
                   }
              })
+```
