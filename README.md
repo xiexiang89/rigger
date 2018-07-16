@@ -1,5 +1,5 @@
-# rigger
-Android 权限请求 activityresult工具类,支持在回调方法中处理界面回调结果
+# Rigger
+是一个处理权限请求和onActivityResult的工具类,不再需要onRequestPermissionsResult和onActivityResult中处理逻辑
 
 ## requestPermissions
 ```
