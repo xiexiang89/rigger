@@ -1,26 +1,31 @@
 package com.igo.android.rigger
 
+import android.app.Activity
+import android.app.FragmentManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.FragmentActivity
-import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentManager as SupportFragmentManager
 
 import com.igo.android.rigger.utils.Utils
 
 import java.io.Serializable
+import java.lang.ref.WeakReference
 import java.util.*
 
 /**
  *  * 1.权限请求封装,通过接口回调方式处理权限请求结果
  *  * 2.简化requestCode处理.
  */
-class Rigger private constructor(activity: FragmentActivity) {
+class Rigger private constructor(activity: Activity) {
 
-    private val mFragmentManager: FragmentManager
-    private var mRiggerFragment: RiggerFragment? = null
+    private var mContextRef: WeakReference<Context> = WeakReference(activity)
+    private var mRiggerPresenter: RiggerPresenter
 
     private var mPermissions: Array<String>? = null
     private var mRequestCode: Int = 0
@@ -28,18 +33,37 @@ class Rigger private constructor(activity: FragmentActivity) {
     private var mParams: Bundle? = null
 
     init {
-        mFragmentManager = activity.supportFragmentManager
-        addRiggerFragment()
+        if (activity is FragmentActivity) {
+            mRiggerPresenter = getSupportRiggerPresenter(activity.supportFragmentManager)
+        } else {
+            mRiggerPresenter = getRiggerPresenter(activity.fragmentManager)
+        }
     }
 
-    private fun addRiggerFragment() {
-        mRiggerFragment = mFragmentManager.findFragmentByTag(makeFragmentTag()) as RiggerFragment?
-        if (mRiggerFragment == null) {
-            mRiggerFragment = RiggerFragment()
-            val transaction = mFragmentManager.beginTransaction()
-            transaction.add(mRiggerFragment, makeFragmentTag())
+    private fun getRiggerPresenter(fm: FragmentManager): RiggerPresenter {
+        var riggerFragment = fm.findFragmentByTag(RIGGER_FRAGMENT_TAG) as RiggerFragment?
+        if (riggerFragment == null) {
+            riggerFragment = RiggerFragment()
+            val transaction = fm.beginTransaction()
+            transaction.add(riggerFragment, RIGGER_FRAGMENT_TAG)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                transaction.commitNowAllowingStateLoss()
+            } else {
+                transaction.commitAllowingStateLoss()
+            }
+        }
+        return riggerFragment.getRiggerPresenter()
+    }
+
+    private fun getSupportRiggerPresenter(fm: SupportFragmentManager): RiggerPresenter {
+        var riggerFragment = fm.findFragmentByTag(RIGGER_FRAGMENT_TAG) as SupportRiggerFragment?
+        if (riggerFragment == null) {
+            riggerFragment = SupportRiggerFragment()
+            val transaction = fm.beginTransaction()
+            transaction.add(riggerFragment, RIGGER_FRAGMENT_TAG)
             transaction.commitNowAllowingStateLoss()
         }
+        return riggerFragment.getRiggerPresenter()
     }
 
     fun requestCode(requestCode: Int): Rigger {
@@ -57,15 +81,33 @@ class Rigger private constructor(activity: FragmentActivity) {
         val z = mPermissions!!.size
         for ( i in 0 until z) {
             val permission = mPermissions!![i]
-            if (ActivityCompat.checkSelfPermission(mRiggerFragment!!.context!!, permission) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(mContextRef.get()!!, permission) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions = Utils.append(requestPermissions, permission, true)
             } else {
-                mRiggerFragment!!.deliverPermissionResult(callback, permission)
+                mRiggerPresenter.deliverPermissionResult(callback, permission)
             }
         }
         if (requestPermissions?.isEmpty() == false) {
-            mRiggerFragment!!.addPermissionCallback(mRequestCode, callback)
-            mRiggerFragment!!.requestPermissions(requestPermissions, mRequestCode)
+            //6.0+才去动态申请权限
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (mRiggerPresenter.isAdded()) {
+                    mRiggerPresenter.addPermissionCallback(mRequestCode, callback)
+                    mRiggerPresenter.requestPermissions(requestPermissions, mRequestCode)
+                } else {
+                    mRiggerPresenter.setOnFragmentAddedListener(object : OnFragmentAddedListener{
+                        override fun onAdded() {
+                            mRiggerPresenter.addPermissionCallback(mRequestCode, callback)
+                            mRiggerPresenter.requestPermissions(requestPermissions, mRequestCode)
+                        }
+                    })
+                }
+            } else {
+                val N = requestPermissions.size
+                for ( i in 0 until N) {
+                    val permission = requestPermissions[i]
+                    mRiggerPresenter.deliverPermissionDenied(callback, permission)
+                }
+            }
         }
     }
 
@@ -76,15 +118,32 @@ class Rigger private constructor(activity: FragmentActivity) {
 
     fun start(callback: ActivityResultCallback?) {
         if (callback == null) {
-            mRiggerFragment!!.startActivity(makeIntent())
+            if (mRiggerPresenter.isAdded()) {
+                mRiggerPresenter.startActivity(makeIntent())
+            } else {
+                mRiggerPresenter.setOnFragmentAddedListener(object : OnFragmentAddedListener{
+                    override fun onAdded() {
+                        mRiggerPresenter.startActivity(makeIntent())
+                    }
+                })
+            }
         } else {
-            mRiggerFragment!!.addResultCallback(mRequestCode, callback)
-            mRiggerFragment!!.startActivityForResult(makeIntent(), mRequestCode)
+            if (mRiggerPresenter.isAdded()) {
+                mRiggerPresenter.addResultCallback(mRequestCode, callback)
+                mRiggerPresenter.startActivityForResult(makeIntent(), mRequestCode)
+            } else {
+                mRiggerPresenter.setOnFragmentAddedListener(object : OnFragmentAddedListener{
+                    override fun onAdded() {
+                        mRiggerPresenter.addResultCallback(mRequestCode, callback)
+                        mRiggerPresenter.startActivityForResult(makeIntent(), mRequestCode)
+                    }
+                })
+            }
         }
     }
 
     private fun makeIntent(): Intent {
-        val intent = Intent(mRiggerFragment!!.context, mTargetClazz)
+        val intent = Intent(mContextRef.get()!!, mTargetClazz)
         if (mParams != null) {
             intent.putExtras(mParams!!)
         }
@@ -285,14 +344,10 @@ class Rigger private constructor(activity: FragmentActivity) {
 
     companion object {
 
-        private val TAG = "Rigger"
+        private val RIGGER_FRAGMENT_TAG = "Rigger"
 
-        @JvmStatic fun on(activity: FragmentActivity): Rigger {
+        @JvmStatic fun on(activity: Activity): Rigger {
             return Rigger(activity)
-        }
-
-        @JvmStatic private fun makeFragmentTag(): String {
-            return "Fragment#" + RiggerFragment::class.java.canonicalName
         }
     }
 }

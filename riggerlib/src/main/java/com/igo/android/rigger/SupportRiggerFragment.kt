@@ -1,13 +1,16 @@
 package com.igo.android.rigger
 
-import android.app.Fragment
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.support.v4.app.Fragment
+import android.support.v4.util.SparseArrayCompat
+import android.util.Log
+import com.igo.android.rigger.utils.Utils
+import java.lang.ref.WeakReference
 
-/**
- * Created by Edgar on 2018/7/16.
- */
-class RiggerFragment : Fragment(){
+class SupportRiggerFragment : Fragment() {
 
     private val mRiggerPresenter: RiggerPresenter = RiggerPresenter(RiggerCompat.create(this))
 
