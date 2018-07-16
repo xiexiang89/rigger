@@ -63,9 +63,9 @@ class Rigger private constructor(activity: FragmentActivity) {
                 mRiggerFragment!!.deliverPermissionResult(callback, permission)
             }
         }
-        if (!Utils.isEmpty(requestPermissions)) {
+        if (requestPermissions?.isEmpty() == false) {
             mRiggerFragment!!.addPermissionCallback(mRequestCode, callback)
-            mRiggerFragment!!.requestPermissions(requestPermissions!!, mRequestCode)
+            mRiggerFragment!!.requestPermissions(requestPermissions, mRequestCode)
         }
     }
 

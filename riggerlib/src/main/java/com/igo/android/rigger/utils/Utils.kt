@@ -5,7 +5,7 @@ import java.util.*
 class Utils {
 
     companion object {
-        @JvmStatic fun <T> requireNonNull(obj: T?): T {
+        @JvmStatic fun <T> requireNonNull(obj: T?): T? {
             if (obj == null)
                 throw NullPointerException()
             return obj
