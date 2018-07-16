@@ -54,16 +54,14 @@ class Rigger private constructor(activity: FragmentActivity) {
 
     fun request(callback: PermissionCallback) {
         var requestPermissions: Array<String>? = null
-        var i = 0
         val z = mPermissions!!.size
-        while (i < z) {
+        for ( i in 0 until z) {
             val permission = mPermissions!![i]
             if (ActivityCompat.checkSelfPermission(mRiggerFragment!!.context!!, permission) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions = Utils.append(requestPermissions, permission, true)
             } else {
                 mRiggerFragment!!.deliverPermissionResult(callback, permission)
             }
-            i++
         }
         if (!Utils.isEmpty(requestPermissions)) {
             mRiggerFragment!!.addPermissionCallback(mRequestCode, callback)
@@ -289,11 +287,11 @@ class Rigger private constructor(activity: FragmentActivity) {
 
         private val TAG = "Rigger"
 
-        fun on(activity: FragmentActivity): Rigger {
+        @JvmStatic fun on(activity: FragmentActivity): Rigger {
             return Rigger(activity)
         }
 
-        private fun makeFragmentTag(): String {
+        @JvmStatic private fun makeFragmentTag(): String {
             return "Fragment#" + RiggerFragment::class.java.canonicalName
         }
     }
