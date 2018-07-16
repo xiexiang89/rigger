@@ -19,7 +19,7 @@ class RiggerPresenter(fragmentCompat: RiggerCompat.FragmentCompat) {
     private var mFragmentAddedListener: OnFragmentAddedListener? = null
 
     companion object {
-        @JvmStatic val TAG : String = "RiggerFragment"
+        @JvmStatic val TAG : String = "RiggerPresenter"
     }
 
     fun addPermissionCallback(requestCode: Int,callback: PermissionCallback) {

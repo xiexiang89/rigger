@@ -1,14 +1,8 @@
 package com.igo.android.rigger
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.support.v4.app.Fragment
-import android.support.v4.util.SparseArrayCompat
-import android.util.Log
-import com.igo.android.rigger.utils.Utils
-import java.lang.ref.WeakReference
 
 class SupportRiggerFragment : Fragment() {
 
