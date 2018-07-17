@@ -42,7 +42,7 @@ Rigger.on(this@MainActivity)
 ##### Rigger 1.1
 尚未开发。预计开发目标,会增加intent取值的注解.
 
-###### 提醒
+## 提醒
 Rigger未提交到maven库,需要使用,自行下载工程，在git bash,输入以下命令:
 ```
 git clone git@github.com:xiexiang89/rigger.git
