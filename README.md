@@ -7,7 +7,7 @@ Rigger.on(this@MainActivity)
        .requestCode(REQUEST_CODE)
        .permissions(arrayOf(WRITE_EXTERNAL_STORAGE, CALL_PHONE))
        .request(object : PermissionCallback() {
-              override fun onRequestPermissionSuccess(permission: String) {
+              override fun onGranted(permission: String) {
                     Toast.makeText(this@MainActivity,"请求"+permission+"成功",Toast.LENGTH_LONG).show()
               }
               
