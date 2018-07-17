@@ -2,7 +2,7 @@ package com.android.rigger
 
 import android.content.Intent
 
-open abstract class ActivityResultCallback {
+abstract class ActivityResultCallback {
 
     /**
      * 返回结果成功回调

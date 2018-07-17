@@ -79,23 +79,23 @@ class Rigger private constructor(activity: Activity) {
 
     fun request(callback: PermissionCallback) {
         var requestPermissions: Array<String>? = null
-        val z = mPermissions!!.size
+        val z = mPermissions?.size?:0
         for ( i in 0 until z) {
             val permission = mPermissions!![i]
             if (ActivityCompat.checkSelfPermission(mContextRef.get()!!, permission) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions = Utils.append(requestPermissions, permission, true)
             } else {
-                mRiggerPresenter.deliverPermissionResult(callback, permission)
+                mRiggerPresenter.deliverPermissionGranted(callback, permission)
             }
         }
-        if (requestPermissions?.isEmpty() == false) {
+        if (requestPermissions?.isNotEmpty() == true) {
             //6.0+才去动态申请权限
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (mRiggerPresenter.isAdded()) {
                     mRiggerPresenter.addPermissionCallback(mRequestCode, callback)
                     mRiggerPresenter.requestPermissions(requestPermissions, mRequestCode)
                 } else {
-                    mRiggerPresenter.setOnFragmentAddedListener(object : OnFragmentAddedListener {
+                    mRiggerPresenter.setOnFragmentAddedListener(object : OnFragmentAddedListener{
                         override fun onAdded() {
                             mRiggerPresenter.addPermissionCallback(mRequestCode, callback)
                             mRiggerPresenter.requestPermissions(requestPermissions, mRequestCode)
@@ -108,7 +108,10 @@ class Rigger private constructor(activity: Activity) {
                     val permission = requestPermissions[i]
                     mRiggerPresenter.deliverPermissionDenied(callback, permission)
                 }
+                mRiggerPresenter.deliverPermissionsDenied(callback,requestPermissions)
             }
+        } else {
+            mRiggerPresenter.deliverPermissionsGranted(callback, mPermissions)
         }
     }
 

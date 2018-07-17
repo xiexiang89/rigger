@@ -18,33 +18,49 @@ class RiggerPresenter(fragmentCompat: RiggerCompat.FragmentCompat) {
     private var mFragmentAddedListener: OnFragmentAddedListener? = null
 
     companion object {
-        @JvmStatic val TAG : String = "RiggerPresenter"
+        @JvmStatic val TAG : String = "RiggerFragment"
     }
 
     fun addPermissionCallback(requestCode: Int,callback: PermissionCallback) {
         mPermissionCallbacks.put(requestCode, callback)
     }
 
-    private fun getPermissionCallback(requestCode: Int): PermissionCallback? = mPermissionCallbacks.get(requestCode)
+    private fun getPermissionCallback(requestCode: Int):PermissionCallback? = mPermissionCallbacks.get(requestCode)
 
-    fun deliverPermissionResult(callback: PermissionCallback?, permission: String) {
-        callback?.onRequestPermissionSuccess(permission)
+    fun deliverPermissionGranted(callback: PermissionCallback?, permission: String) {
+        callback?.onGranted(permission)
     }
 
-    fun deliverPermissionDenied(callback: PermissionCallback?, permission: String) {
+    fun deliverPermissionsGranted(callback: PermissionCallback?, permissions: Array<out String>?){
+        callback?.onGranted(permissions)
+    }
+
+    fun deliverPermissionDenied(callback: PermissionCallback?,permission: String) {
         callback?.onDenied(permission)
+    }
+
+    fun deliverPermissionsDenied(callback: PermissionCallback?,permissions: Array<out String>?) {
+        callback?.onDenied(permissions)
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         Log.d(TAG,"Rigger request permission result.")
         if (!Utils.isEmpty(permissions) && !Utils.isEmpty(grantResults)) {
             val callback = getPermissionCallback(requestCode)
+            var deniedPermissions: Array<String>? = null
             for (i in 0 until permissions.size) {
+                val permission = permissions[i]
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                    deliverPermissionResult(callback,permissions[i])
+                    deliverPermissionGranted(callback,permission)
                 } else {
-                    deliverPermissionDenied(callback,permissions[i])
+                    deniedPermissions = Utils.append(deniedPermissions,permission,true)
+                    deliverPermissionDenied(callback,permission)
                 }
+            }
+            if (deniedPermissions?.isNotEmpty() == true) {
+                deliverPermissionsDenied(callback,deniedPermissions)
+            } else {
+                deliverPermissionsGranted(callback,permissions)
             }
         }
         mPermissionCallbacks.remove(requestCode)

@@ -1,6 +1,5 @@
 package com.android.rigger.utils
 
-import android.Manifest
 import android.Manifest.permission.CALL_PHONE
 import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
@@ -14,16 +13,11 @@ import android.provider.ContactsContract
 import android.provider.MediaStore
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
-import android.text.TextUtils
-import android.util.Log
 import com.android.rigger.ActivityResultCallback
 import com.android.rigger.PermissionCallback
 import com.android.rigger.Rigger
 
 import java.io.File
-import android.support.v4.content.ContextCompat.startActivity
-
-
 
 /**
  * Created by Edgar on 2018/7/17.
@@ -50,8 +44,8 @@ object SystemAppUtils {
                     .permissions(arrayOf(CAMERA))
                     .requestCode(REQUEST_CODE_CAMERA)
                     .request(object : PermissionCallback() {
-                        override fun onRequestPermissionSuccess(permission: String) {
-                            super.onRequestPermissionSuccess(permission)
+                        override fun onGranted(permission: String) {
+                            super.onGranted(permission)
                             openCameraInternal(context, outFile, callback)
                         }
                     })
@@ -78,8 +72,8 @@ object SystemAppUtils {
                     .permissions(arrayOf(CALL_PHONE))
                     .requestCode(REQUEST_CODE_CALL_PHONE)
                     .request(object : PermissionCallback(){
-                        override fun onRequestPermissionSuccess(permission: String) {
-                            super.onRequestPermissionSuccess(permission)
+                        override fun onGranted(permission: String) {
+                            super.onGranted(permission)
                             startCallPhoneInternal(activity,phone)
                         }
                     })
