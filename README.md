@@ -1,5 +1,5 @@
 # rigger
-Android 权限请求 activityresult工具类,支持在回调方法中处理界面回调结果
+是一个处理权限请求和onActivityResult的工具类,不再需要onRequestPermissionsResult和onActivityResult中处理逻辑
 
 ## requestPermissions
 ```
@@ -41,3 +41,9 @@ Rigger.on(this@MainActivity)
 
 ##### Rigger 1.1
 尚未开发。预计开发目标,会增加intent取值的注解.
+
+###### 提醒
+Rigger未提交到maven库,需要使用,自行下载工程，在git bash,输入以下命令:
+```
+git clone git@github.com:xiexiang89/rigger.git
+```
