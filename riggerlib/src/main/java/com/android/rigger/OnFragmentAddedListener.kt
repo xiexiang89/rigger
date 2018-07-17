@@ -1,4 +1,4 @@
-package com.igo.android.rigger
+package com.android.rigger
 
 /**
  * Created by Edgar on 2018/7/16.

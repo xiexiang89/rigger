@@ -32,3 +32,12 @@ Rigger.on(this@MainActivity)
                   }
              })
 ```
+
+## 更新日志
+
+##### Rigger 1.0
+> * 封装便捷的权限请求和onActivityResult
+> * 一些常用的系统app工具类,在一些需要权限的app,如:相机、拨号,内部增加权限判断,不需要外部处理
+
+##### Rigger 1.1
+尚未开发。预计开发目标,会增加intent取值的注解.

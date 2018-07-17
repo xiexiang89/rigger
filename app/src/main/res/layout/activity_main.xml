@@ -26,4 +26,35 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/test"
         android:text="ActivityResult测试"/>
+
+    <Button
+        android:id="@+id/camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/jump"
+        android:text="打开相机"/>
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/camera"
+        android:layout_marginTop="40dp"/>
+    <Button
+        android:id="@+id/call_phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/image"
+        android:text="打电话"/>
+    <Button
+        android:id="@+id/dial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/call_phone"
+        android:text="打开拨号盘"/>
+    <Button
+        android:id="@+id/deleteapp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/call_phone"
+        android:text="卸载app"/>
 </android.support.constraint.ConstraintLayout>

@@ -1,4 +1,4 @@
-package com.igo.android.rigger
+package com.android.rigger
 
 abstract class PermissionCallback {
 

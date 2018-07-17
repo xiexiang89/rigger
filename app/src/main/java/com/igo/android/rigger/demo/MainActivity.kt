@@ -2,13 +2,16 @@ package com.igo.android.rigger.demo
 
 import android.Manifest.permission.*
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import com.igo.android.rigger.ActivityResultCallback
-import com.igo.android.rigger.PermissionCallback
-import com.igo.android.rigger.Rigger
+import com.android.rigger.ActivityResultCallback
+import com.android.rigger.PermissionCallback
+import com.android.rigger.Rigger
+import com.android.rigger.utils.SystemAppUtils
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,6 +50,24 @@ class MainActivity : AppCompatActivity() {
                                     Toast.LENGTH_LONG).show()
                         }
                     })
+        }
+        camera.setOnClickListener {
+            val file = File(externalCacheDir,"camera.png")
+            SystemAppUtils.openCamera(this@MainActivity, file,object : ActivityResultCallback(){
+                override fun onResult(data: Intent?) {
+                    super.onResult(data)
+                    image.setImageBitmap(BitmapFactory.decodeFile(file.absolutePath))
+                }
+            })
+        }
+        call_phone.setOnClickListener {
+            SystemAppUtils.startCallPhone(this,"1598661111")
+        }
+        dial.setOnClickListener{
+            SystemAppUtils.startDialForUri(this)
+        }
+        deleteapp.setOnClickListener{
+            SystemAppUtils.uninstallApp(this)
         }
     }
 }

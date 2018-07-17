@@ -1,20 +1,19 @@
-package com.igo.android.rigger
+package com.android.rigger
 
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.util.SparseArrayCompat
 import android.util.Log
-import com.igo.android.rigger.utils.Utils
-import java.lang.ref.WeakReference
+import com.android.rigger.utils.Utils
 
 /**
  * Created by Edgar on 2018/7/16.
  */
 class RiggerPresenter(fragmentCompat: RiggerCompat.FragmentCompat) {
 
-    private val mPermissionCallbacks: SparseArrayCompat<WeakReference<PermissionCallback>> = SparseArrayCompat()
-    private val mActivityResultCallbacks: SparseArrayCompat<WeakReference<ActivityResultCallback>> = SparseArrayCompat()
+    private val mPermissionCallbacks: SparseArrayCompat<PermissionCallback> = SparseArrayCompat()
+    private val mActivityResultCallbacks: SparseArrayCompat<ActivityResultCallback> = SparseArrayCompat()
     private val mFragmentCompat: RiggerCompat.FragmentCompat = fragmentCompat
     private var mFragmentAddedListener: OnFragmentAddedListener? = null
 
@@ -23,16 +22,16 @@ class RiggerPresenter(fragmentCompat: RiggerCompat.FragmentCompat) {
     }
 
     fun addPermissionCallback(requestCode: Int,callback: PermissionCallback) {
-        mPermissionCallbacks.put(requestCode, WeakReference(callback))
+        mPermissionCallbacks.put(requestCode, callback)
     }
 
-    private fun getPermissionCallback(requestCode: Int):PermissionCallback? = mPermissionCallbacks.get(requestCode).get()
+    private fun getPermissionCallback(requestCode: Int): PermissionCallback? = mPermissionCallbacks.get(requestCode)
 
     fun deliverPermissionResult(callback: PermissionCallback?, permission: String) {
         callback?.onRequestPermissionSuccess(permission)
     }
 
-    fun deliverPermissionDenied(callback: PermissionCallback?,permission: String) {
+    fun deliverPermissionDenied(callback: PermissionCallback?, permission: String) {
         callback?.onDenied(permission)
     }
 
@@ -52,18 +51,18 @@ class RiggerPresenter(fragmentCompat: RiggerCompat.FragmentCompat) {
     }
 
     fun addResultCallback(requestCode: Int, callback: ActivityResultCallback) {
-        mActivityResultCallbacks.put(requestCode, WeakReference(callback))
+        mActivityResultCallbacks.put(requestCode, callback)
     }
 
     private fun deliverResult(requestCode: Int, data: Intent?) {
         val callback = mActivityResultCallbacks.get(requestCode)
-        callback.get()?.onResult(data)
+        callback?.onResult(data)
         mActivityResultCallbacks.remove(requestCode)
     }
 
     private fun deliverCanceled(requestCode: Int) {
         val callback = mActivityResultCallbacks.get(requestCode)
-        callback.get()?.onCanceled()
+        callback?.onCanceled()
         mActivityResultCallbacks.remove(requestCode)
     }
 

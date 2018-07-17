@@ -1,13 +1,10 @@
-package com.igo.android.rigger
+package com.android.rigger
 
-import android.app.Fragment
 import android.content.Context
 import android.content.Intent
+import android.support.v4.app.Fragment
 
-/**
- * Created by Edgar on 2018/7/16.
- */
-class RiggerFragment : Fragment(){
+class SupportRiggerFragment : Fragment() {
 
     private val mRiggerPresenter: RiggerPresenter = RiggerPresenter(RiggerCompat.create(this))
 

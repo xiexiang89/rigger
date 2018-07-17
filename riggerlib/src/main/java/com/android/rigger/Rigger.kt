@@ -1,4 +1,4 @@
-package com.igo.android.rigger
+package com.android.rigger
 
 import android.app.Activity
 import android.app.FragmentManager
@@ -12,7 +12,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentManager as SupportFragmentManager
 
-import com.igo.android.rigger.utils.Utils
+import com.android.rigger.utils.Utils
 
 import java.io.Serializable
 import java.lang.ref.WeakReference
@@ -30,6 +30,7 @@ class Rigger private constructor(activity: Activity) {
     private var mPermissions: Array<String>? = null
     private var mRequestCode: Int = 0
     private var mTargetClazz: Class<*>? = null
+    private var mAction: String? = null
     private var mParams: Bundle? = null
 
     init {
@@ -94,7 +95,7 @@ class Rigger private constructor(activity: Activity) {
                     mRiggerPresenter.addPermissionCallback(mRequestCode, callback)
                     mRiggerPresenter.requestPermissions(requestPermissions, mRequestCode)
                 } else {
-                    mRiggerPresenter.setOnFragmentAddedListener(object : OnFragmentAddedListener{
+                    mRiggerPresenter.setOnFragmentAddedListener(object : OnFragmentAddedListener {
                         override fun onAdded() {
                             mRiggerPresenter.addPermissionCallback(mRequestCode, callback)
                             mRiggerPresenter.requestPermissions(requestPermissions, mRequestCode)
@@ -116,26 +117,32 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
+    fun targetAction(action: String): Rigger {
+        mAction = Utils.requireNonNull(action)
+        return this
+    }
+
     fun start(callback: ActivityResultCallback?) {
+        val intent = makeIntent()
         if (callback == null) {
             if (mRiggerPresenter.isAdded()) {
-                mRiggerPresenter.startActivity(makeIntent())
+                mRiggerPresenter.startActivity(intent)
             } else {
-                mRiggerPresenter.setOnFragmentAddedListener(object : OnFragmentAddedListener{
+                mRiggerPresenter.setOnFragmentAddedListener(object : OnFragmentAddedListener {
                     override fun onAdded() {
-                        mRiggerPresenter.startActivity(makeIntent())
+                        mRiggerPresenter.startActivity(intent)
                     }
                 })
             }
         } else {
             if (mRiggerPresenter.isAdded()) {
                 mRiggerPresenter.addResultCallback(mRequestCode, callback)
-                mRiggerPresenter.startActivityForResult(makeIntent(), mRequestCode)
+                mRiggerPresenter.startActivityForResult(intent, mRequestCode)
             } else {
-                mRiggerPresenter.setOnFragmentAddedListener(object : OnFragmentAddedListener{
+                mRiggerPresenter.setOnFragmentAddedListener(object : OnFragmentAddedListener {
                     override fun onAdded() {
                         mRiggerPresenter.addResultCallback(mRequestCode, callback)
-                        mRiggerPresenter.startActivityForResult(makeIntent(), mRequestCode)
+                        mRiggerPresenter.startActivityForResult(intent, mRequestCode)
                     }
                 })
             }
@@ -143,14 +150,23 @@ class Rigger private constructor(activity: Activity) {
     }
 
     private fun makeIntent(): Intent {
-        val intent = Intent(mContextRef.get()!!, mTargetClazz)
+        var intent: Intent? = null
+        if (mTargetClazz != null) {
+            intent = Intent(mContextRef.get()!!,mTargetClazz)
+        }
+        if (intent == null && mAction?.isEmpty() == false) {
+            intent = Intent(mAction)
+        }
+        if (intent == null) {
+            throw IllegalArgumentException("invalid intent target,please config targetClass or action")
+        }
         if (mParams != null) {
             intent.putExtras(mParams!!)
         }
         return intent
     }
 
-    fun put(key: String, value: String): Rigger {
+    fun put(key: String, value: String?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -158,7 +174,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: Array<String>): Rigger {
+    fun put(key: String, value: Array<String>?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -166,7 +182,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun putStringArrayList(key: String, value: ArrayList<String>): Rigger {
+    fun putStringArrayList(key: String, value: ArrayList<String>?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -174,7 +190,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: CharSequence): Rigger {
+    fun put(key: String, value: CharSequence?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -182,7 +198,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: Array<CharSequence>): Rigger {
+    fun put(key: String, value: Array<CharSequence>?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -198,7 +214,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: IntArray): Rigger {
+    fun put(key: String, value: IntArray?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -206,7 +222,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun putIntegerArrayList(key: String, value: ArrayList<Int>): Rigger {
+    fun putIntegerArrayList(key: String, value: ArrayList<Int>?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -222,7 +238,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: ShortArray): Rigger {
+    fun put(key: String, value: ShortArray?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -238,7 +254,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: ByteArray): Rigger {
+    fun put(key: String, value: ByteArray?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -254,7 +270,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: BooleanArray): Rigger {
+    fun put(key: String, value: BooleanArray?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -270,7 +286,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: LongArray): Rigger {
+    fun put(key: String, value: LongArray?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -286,7 +302,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: FloatArray): Rigger {
+    fun put(key: String, value: FloatArray?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -302,7 +318,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: DoubleArray): Rigger {
+    fun put(key: String, value: DoubleArray?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -310,7 +326,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: Parcelable): Rigger {
+    fun put(key: String, value: Parcelable?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -318,7 +334,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: Array<Parcelable>): Rigger {
+    fun put(key: String, value: Array<Parcelable>?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -326,7 +342,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun putParcelableArrayList(key: String, value: ArrayList<Parcelable>): Rigger {
+    fun putParcelableArrayList(key: String, value: ArrayList<Parcelable>?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
@@ -334,7 +350,7 @@ class Rigger private constructor(activity: Activity) {
         return this
     }
 
-    fun put(key: String, value: Serializable): Rigger {
+    fun put(key: String, value: Serializable?): Rigger {
         if (mParams == null) {
             mParams = Bundle()
         }
