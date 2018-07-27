@@ -1,0 +1,57 @@
+apply plugin: 'maven'
+
+//task buildJar(dependsOn: ['compileReleaseJavaWithJavac'], type: Jar) {
+//    version = "1.0.0"
+//    extension = "jar"
+//
+//    //需打包的资源所在的路径集
+//    def srcClassDir = [project.buildDir.absolutePath + "/intermediates/classes/release"];
+//    //初始化资源路径集
+//    from srcClassDir
+//}
+
+task androidJavadocs(type: Javadoc) {
+    failOnError = false
+    source = android.sourceSets.main.java.srcDirs
+    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+    classpath += files(ext.androidJar)
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+uploadArchives {
+    repositories{
+        mavenDeployer{
+            repository(url:getMavenUploadUrl()){
+                authentication(userName: 'admin', password: 'admin123')
+            }
+
+//            final String snapshot = rootProject.maybeSNAPSHOT();
+            pom.project{
+                name = NAME
+                groupId = "com.rigger.android"
+                artifactId = ARTIFACTID
+                version = VERSION
+                packaging = PACKAGING
+                description = DESCRIPTION
+            }
+            artifacts{
+                archives androidSourcesJar
+                archives androidJavadocsJar
+            }
+        }
+    }
+}
+
+String getMavenUploadUrl(){
+    Map<String,?> properties = rootProject.getProperties();
+    return properties.get("mvn_push_url");
+}

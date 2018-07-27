@@ -1,1 +1,1 @@
-include ':app', ':riggerlib'
+include ':app', ':riggerlib', ':intentProcessor', ':annotations'

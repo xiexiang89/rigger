@@ -1,0 +1,12 @@
+apply plugin: 'java-library'
+apply from: '../maven_java_push.gradle'
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.google.auto.service:auto-service:1.0-rc4'
+    implementation 'com.rigger.android:annotations:1.0.5'
+    implementation 'com.squareup:javapoet:1.11.1'
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"

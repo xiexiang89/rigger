@@ -44,12 +44,12 @@ class MainActivity : AppCompatActivity() {
             Rigger.on(this@MainActivity)
                     .requestCode(REQUEST_CODE)
                     .targetActivity(TestActivity::class.java)
-                    .put("key","main")
+                    .put("key","测试intent注入")
                     .start(object : ActivityResultCallback() {
                         override fun onResult(data: Intent?) {
                             super.onResult(data)
                             Toast.makeText(this@MainActivity,"result:"+data?.getStringExtra("key"),
-                                    Toast.LENGTH_LONG).show()
+                                    Toast.LENGTH_SHORT).show()
                         }
                     })
         }
