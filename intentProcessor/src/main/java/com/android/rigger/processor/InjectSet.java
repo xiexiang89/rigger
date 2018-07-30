@@ -15,8 +15,13 @@ import javax.lang.model.element.TypeElement;
  */
 public class InjectSet {
 
+    public static final ClassName INTENT_UTILS = ClassName.get("com.android.rigger.utils","IntentUtils");
     public static final ClassName ACTIVITY_TYPE = ClassName.get("android.app","Activity");
     public static final ClassName INTENT_TYPE = ClassName.get("android.content","Intent");
+    public static final ClassName STRING_TYPE = ClassName.get("java.lang","String");
+    public static final ClassName SERIALIZABLE_TYPE = ClassName.get("java.io","Serializable");
+    public static final ClassName PARCELABLE_TYPE = ClassName.get("android.os","Parcelable");
+    public static final ClassName CHAR_SEQUENCE_TYPE = ClassName.get("java.lang","CharSequence");
 
     private ClassName className;
     private ImmutableList.Builder<FieldBinding> fieldBindingBuilder = ImmutableList.builder();
