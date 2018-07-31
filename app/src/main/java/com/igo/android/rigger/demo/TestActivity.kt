@@ -10,26 +10,24 @@ import com.rigger.android.annotation.*
 
 class TestActivity : AppCompatActivity() {
 
-    @IntentValue(name = "key")
+    @IntentValue(name = "keyString",defString = "测试默认值")
     @JvmField
     var text: String? = null
 
-    @IntentValue(name = "key2",fieldType = FieldType.CharSequence)
+    @IntentValue(name = "keyChar",defChar = 'a')
     @JvmField
-    var charTest: CharSequence = ""
+    var charTest: Char = '0'
 
-    @IntentValue(name = "testInt",defInt = 10)
+    @IntentValue(name = "keyInt",defInt = 10)
     @JvmField
     var teInt: Int = 0
-
-    @IntentValue(name = "testBean",fieldType = FieldType.Parcelable)
-    @JvmField
-    var testBean: TestBean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         IntentInject.inject(this,this)
-        Log.d("Test","Rigger intent:$text")
+        Log.d("Test","Rigger intent String:$text")
+        Log.d("Test","Rigger intent Char:$charTest")
+        Log.d("Test","Rigger intent Int:$teInt")
     }
 
     override fun finish() {

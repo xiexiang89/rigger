@@ -211,12 +211,12 @@ object IntentUtils {
         }
     }
 
-    @JvmStatic fun  getCharSequence(intent: Intent,name: String,default: CharSequence = ""): CharSequence{
+    @JvmStatic fun <T:CharSequence> getCharSequence(intent: Intent,name: String): T? {
         return try {
-            intent.extras.getCharSequence(name,default)
+            intent.extras.getCharSequence(name) as T
         } catch (e: Exception) {
             Log.d(TAG,"getCharSequence fail",e)
-            default
+            null
         }
     }
 

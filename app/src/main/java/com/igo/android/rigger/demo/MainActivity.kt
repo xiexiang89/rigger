@@ -43,8 +43,9 @@ class MainActivity : AppCompatActivity() {
         jump.setOnClickListener {
             Rigger.on(this@MainActivity)
                     .requestCode(REQUEST_CODE)
-                    .targetActivity(Test1Activity::class.java)
-                    .put("key","测试intent注入")
+                    .targetActivity(TestActivity::class.java)
+                    .put("keyString","测试intent注入")
+                    .put("keyInt",40)
                     .start(object : ActivityResultCallback() {
                         override fun onResult(data: Intent?) {
                             super.onResult(data)

@@ -14,7 +14,7 @@ public @interface IntentValue {
 
     String name();
 
-    FieldType fieldType() default FieldType.Basic;
+    ValueType valueType() default ValueType.Basic;
 
     int defInt() default 0;
     float defFloat() default 0.0f;

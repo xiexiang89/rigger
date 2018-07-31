@@ -51,6 +51,8 @@ public class FieldBinding {
         } else {
             if (typeName == InjectSet.STRING_TYPE || String.class.isInstance(defaultValue)) {
                 codeBlock.add("$T.$L(intent,$S,$S);\n",InjectSet.INTENT_UTILS,getIntentMethod(),key,defaultValue);
+            } else if (typeName == TypeName.CHAR){
+                codeBlock.add("$T.$L(intent,$S,\'$L\');\n",InjectSet.INTENT_UTILS,getIntentMethod(),key,defaultValue);
             } else {
                 codeBlock.add("$T.$L(intent,$S,$L);\n",InjectSet.INTENT_UTILS,getIntentMethod(),key,defaultValue);
             }
@@ -62,6 +64,8 @@ public class FieldBinding {
         String methodName = null;
         if (TypeName.BOOLEAN.equals(typeName)) {
             methodName = "getBoolean";
+        } else if (TypeName.CHAR.equals(typeName)) {
+            methodName = "getChar";
         } else if (TypeName.BYTE.equals(typeName)) {
             methodName = "getByte";
         } else if (TypeName.SHORT.equals(typeName)) {

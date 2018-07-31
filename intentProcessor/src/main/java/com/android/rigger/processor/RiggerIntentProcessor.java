@@ -1,6 +1,5 @@
 package com.android.rigger.processor;
 
-import com.rigger.android.annotation.FieldType;
 import com.rigger.android.annotation.IntentValue;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
@@ -93,61 +92,16 @@ public class RiggerIntentProcessor extends AbstractProcessor {
                 fieldType = declaredType;
             }
         }
-        TypeName typeName = null;
-        if (Utils.isBasicType(fieldType)) {
-            typeName = TypeName.get(fieldType);
-        } else {
-            if (Utils.isString(fieldType.toString())) {
-                typeName = InjectSet.STRING_TYPE;
-            } else {
-                switch (intentValue.fieldType()) {
-                    case Serializable:
-                        typeName = InjectSet.SERIALIZABLE_TYPE;
-                        break;
-                    case Parcelable:
-                        typeName = InjectSet.PARCELABLE_TYPE;
-                        break;
-                    case CharSequence:
-                        typeName = InjectSet.CHAR_SEQUENCE_TYPE;
-                        break;
-                }
-            }
-        }
+        TypeName typeName = Utils.getTypeName(fieldType,intentValue.valueType());
         if (typeName == null) {
             throw new IllegalArgumentException("unrecognized field types.");
         }
-        boolean supportDefValue = isSupportDefaultValue(fieldType,intentValue);
-        FieldBinding fieldBinding = supportDefValue ? new FieldBinding(elementName,typeName, kind, intentValue.name(),getDefaultValue(fieldType,intentValue)) :
-                new FieldBinding(elementName, typeName, kind, intentValue.name());
-        injectSet.addField(fieldBinding);
-    }
-
-    private Object getDefaultValue(TypeMirror typeMirror,IntentValue value) {
-        final TypeKind kind = typeMirror.getKind();
-        if (kind == TypeKind.BOOLEAN) {
-            return value.defBol();
-        } else if (kind == TypeKind.LONG) {
-            return value.defLong();
-        } else if (kind == TypeKind.INT) {
-            return value.defInt();
-        } else if (kind == TypeKind.DOUBLE) {
-            return value.defDouble();
-        } else if (kind == TypeKind.FLOAT) {
-            return value.defFloat();
-        } else if (kind == TypeKind.CHAR) {
-            return value.defChar();
-        } else if (kind == TypeKind.BYTE) {
-            return value.defByte();
-        } else if (kind == TypeKind.SHORT) {
-            return value.defShort();
-        } else if (Utils.isString(typeMirror.toString()) || value.fieldType() == FieldType.CharSequence) {
-            return value.defString();
+        TypeValue typeValue = TypeValue.Factory.createTypeValue(typeName);
+        if (typeValue != null) {
+            injectSet.addField(new FieldBinding(elementName,typeName, kind, intentValue.name(),typeValue.value(intentValue)));
+        } else {
+            injectSet.addField(new FieldBinding(elementName, typeName, kind, intentValue.name()));
         }
-        return null;
-    }
-
-    private boolean isSupportDefaultValue(TypeMirror typeMirror,IntentValue value) {
-        return Utils.isBasicType(typeMirror) || Utils.isString(typeMirror.toString()) || value.fieldType() == FieldType.CharSequence;
     }
 
     @Override
